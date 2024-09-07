@@ -1,5 +1,72 @@
 # 更新日志（Changelog）
 
+## v1.4.0
+
+### 2024/9/5
+
+- 注意：本次更新涉及配置变更，请以最新 config/config.ini 为准，工作流使用 user_config.ini 或 docker 挂载的用户请及时更新配置文件
+- 新增组播源运行模式：FOFA、Tonkiang
+- 新增支持组播源自定义维护频道 IP，目录位于 config/rtp，文件按“地区\_运营商”命名
+- 优化测速方法，大幅提升组播源、酒店源的测速速度
+- 优化频道名称匹配方法，支持模糊匹配，提高命中率
+- 优化地区输入选择框
+- 修复 driver 模式请求问题
+- 修复组播地区选择全部时无法运行问题
+- 修复工作流使用 user_config 时无法生成 m3u 结果问题
+
+- Warning: This update involves configuration changes. Please refer to the latest config/config.ini. Users using user_config.ini or Docker-mounted configurations should update their configuration files promptly.
+- Added multicast source operation modes: FOFA, Tonkiang.
+- Added support for custom-maintained multicast source channel IPs, located in config/rtp, with files named by "region_operator".
+- Optimized speed test method, significantly improving the speed test of multicast sources and hotel sources.
+- Optimized channel name matching method to support fuzzy matching, increasing hit rate.
+- Optimized region input selection box.
+- Fixed an issue with driver mode requests.
+- Fixed an issue where multicast would not run when all regions were selected.
+- Fixed an issue where workflows using user_config could not generate m3u results.
+
+## v1.3.9
+
+### 2024/8/30
+
+- 酒店源新增 ZoomEye 数据源，开启 FOFA 配置即可使用（Added ZoomEye data source to hotel sources, can be used by enabling FOFA configuration）
+- 酒店源、组播源地区选项增加“全部”选项（Added "all" option to the region selection for hotel sources and multicast sources）
+- 调整默认运行配置：关闭订阅源更新、Tonkiang 酒店源更新（Adjusted default runtime configuration: disabled subscription source updates and Tonkiang hotel source updates）
+
+## v1.3.8
+
+### 2024/8/29
+
+- 更新组播地区 IP 缓存数据（Update multicast area IP cache data）
+- 移除 source_channels 配置项（Remove source_channels configuration item）
+- 优化模板频道名称匹配（Optimize template channel name matching）
+- 优化进度条，显示接口处理进度（Optimize the progress bar to display the interface processing progress）
+- UI 软件增加部分图标（Add some icons to the UI software）
+
+## v1.3.7
+
+### 2024/8/27
+
+- 新增支持 M3U 结果格式转换，支持显示频道图标(open_m3u_result)（Added support for M3U result format conversion, including channel icon display (open_m3u_result)）
+- 新增对于无结果的频道进行额外补充查询（Added additional queries for channels with no results）
+- 增加控制使用 FFmpeg 开关(open_ffmpeg)（Added a switch to control the use of FFmpeg (open_ffmpeg)）
+- 调整默认配置以酒店源模式运行（Adjusted default configuration to run in hotel source mode）
+- 优化测速方法（Optimize Speed Test Method）
+- 修复酒店源 CCTV 类等频道结果匹配异常（Fixed abnormal matching of results for hotel source CCTV channels）
+- 修复组播源、酒店源 driver 运行问题（Fixed issues with multicast source and hotel source driver operation）
+- 修复订阅源更新异常（Fixed subscription source update anomalies）
+
+## v1.3.6
+
+### 2024/8/22
+
+- 新增酒店源更新，支持 Tonkiang、FOFA 两种工作模式（Added hotel source updates, supporting Tonkiang and FOFA working modes）
+- 重构 UI 界面软件，新增帮助-关于、获取频道名称编辑、酒店源相关配置、软件图标（Refactored UI interface software, added Help-About, channel name editing, hotel source related configuration, and software icon）
+- 新增测速日志页面服务，结果链接后添加/log 即可查看（Added a new speed test log page service. To view the results, simply add /log to the link）
+- 移除关注频道相关配置（Removed configuration related to followed channels）
+- 修复 Docker 定时任务未执行问题（Fixed issue with Docker scheduled tasks not executing）
+- 修复使用历史结果时频道数据异常问题（Fixed issue with channel data anomalies when using historical results）
+- 优化 UI 界面软件运行生成配置目录，方便查看与修改（Optimized UI interface software to generate configuration directory for easier viewing and modification）
+
 ## v1.3.5
 
 ### 2024/8/14

@@ -9,10 +9,18 @@ from utils.tools import merge_objects, get_pbar_remaining
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 
-timeout = 30
+timeout = 10
 
 
-async def get_channels_by_subscribe_urls(urls=None, multicast=False, callback=None):
+async def get_channels_by_subscribe_urls(
+    urls,
+    multicast=False,
+    hotel=False,
+    retry=True,
+    error_print=True,
+    with_cache=False,
+    callback=None,
+):
     """
     Get the channels by subscribe urls
     """
@@ -24,10 +32,17 @@ async def get_channels_by_subscribe_urls(urls=None, multicast=False, callback=No
         if url.strip()
     ]
     subscribe_urls_len = len(urls if urls else subscribe_urls)
-    pbar = tqdm_asyncio(total=subscribe_urls_len, desc="Processing subscribe")
+    pbar = tqdm_asyncio(
+        total=subscribe_urls_len,
+        desc=f"Processing subscribe {'for multicast' if multicast else ''}",
+    )
     start_time = time()
+    mode_name = "组播" if multicast else "酒店" if hotel else "订阅"
     if callback:
-        callback(f"正在获取订阅源更新, 共{subscribe_urls_len}个订阅源", 0)
+        callback(
+            f"正在获取{mode_name}源, 共{subscribe_urls_len}个{mode_name}源",
+            0,
+        )
     session = Session()
 
     def process_subscribe_channels(subscribe_info):
@@ -41,13 +56,18 @@ async def get_channels_by_subscribe_urls(urls=None, multicast=False, callback=No
         try:
             response = None
             try:
-                response = retry_func(
-                    lambda: session.get(subscribe_url, timeout=timeout),
-                    name=subscribe_url,
+                response = (
+                    retry_func(
+                        lambda: session.get(subscribe_url, timeout=timeout),
+                        name=subscribe_url,
+                    )
+                    if retry
+                    else session.get(subscribe_url, timeout=timeout)
                 )
             except exceptions.Timeout:
                 print(f"Timeout on subscribe: {subscribe_url}")
             if response:
+                response.encoding = "utf-8"
                 content = response.text
                 lines = content.split("\n")
                 for line in lines:
@@ -61,11 +81,14 @@ async def get_channels_by_subscribe_urls(urls=None, multicast=False, callback=No
                             else None
                         )
                         url = matcher.group(2).strip()
+                        if with_cache:
+                            url = f"{url}$cache:{subscribe_url}"
                         value = url if multicast else (url, None, resolution)
                         name = format_channel_name(key)
                         if name in channels:
-                            if multicast and value not in channels[name][region][type]:
-                                channels[name][region][type].append(value)
+                            if multicast:
+                                if value not in channels[name][region][type]:
+                                    channels[name][region][type].append(value)
                             elif value not in channels[name]:
                                 channels[name].append(value)
                         else:
@@ -74,13 +97,14 @@ async def get_channels_by_subscribe_urls(urls=None, multicast=False, callback=No
                             else:
                                 channels[name] = [value]
         except Exception as e:
-            print(f"Error on {subscribe_url}: {e}")
+            if error_print:
+                print(f"Error on {subscribe_url}: {e}")
         finally:
             pbar.update()
             remain = subscribe_urls_len - pbar.n
             if callback:
                 callback(
-                    f"正在获取订阅源更新, 剩余{remain}个订阅源待获取, 预计剩余时间: {get_pbar_remaining(n=pbar.n, total=pbar.total, start_time=start_time)}",
+                    f"正在获取{mode_name}源, 剩余{remain}个{mode_name}源待获取, 预计剩余时间: {get_pbar_remaining(n=pbar.n, total=pbar.total, start_time=start_time)}",
                     int((pbar.n / subscribe_urls_len) * 100),
                 )
             return channels
