@@ -1,5 +1,9 @@
 from utils.config import config, resource_path
-from utils.tools import check_url_by_patterns, get_total_urls_from_info_list
+from utils.tools import (
+    check_url_by_patterns,
+    get_total_urls_from_info_list,
+    check_ipv6_support,
+)
 from utils.speed import sort_urls_by_speed_and_resolution, is_ffmpeg_installed
 import os
 from collections import defaultdict
@@ -10,7 +14,6 @@ from logging.handlers import RotatingFileHandler
 from opencc import OpenCC
 import asyncio
 import base64
-from rapidfuzz import process
 
 log_dir = "output"
 log_file = "result_new.log"
@@ -66,6 +69,8 @@ def get_channel_data_from_file(channels=None, file=None, from_result=False):
             if match is not None and match.group(1):
                 name = match.group(1).strip()
                 if name not in channels[current_category]:
+                    if from_result:
+                        continue
                     channels[current_category][name] = []
                 if match.group(3):
                     url = match.group(3).strip()
@@ -102,31 +107,46 @@ def format_channel_name(name):
     """
     if config.getboolean("Settings", "open_keep_all"):
         return name
-    if "cctv" in name.lower():
-        name = re.sub(r"[\u4e00-\u9fa5]", "", name)
     cc = OpenCC("t2s")
     name = cc.convert(name)
-    sub_pattern = r"-|_|\((.*?)\)|\（(.*?)\）|\[(.*?)\]| |频道|普清|标清|高清|HD|hd|超清|超高|超高清|中央|央视|台"
+    sub_pattern = r"-|_|\((.*?)\)|\（(.*?)\）|\[(.*?)\]| |｜|频道|普清|标清|高清|HD|hd|超清|超高|超高清|中央|央视|台"
     name = re.sub(sub_pattern, "", name)
     replace_dict = {
         "plus": "+",
         "PLUS": "+",
         "＋": "+",
+        "CCTV1综合": "CCTV1",
+        "CCTV2财经": "CCTV2",
+        "CCTV3综艺": "CCTV3",
+        "CCTV4国际": "CCTV4",
+        "CCTV4中文国际": "CCTV4",
+        "CCTV4欧洲": "CCTV4",
+        "CCTV5体育": "CCTV5",
+        "CCTV5+体育赛视": "CCTV5+",
+        "CCTV5+体育赛事": "CCTV5+",
+        "CCTV5+体育": "CCTV5+",
+        "CCTV6电影": "CCTV6",
+        "CCTV7军事": "CCTV7",
+        "CCTV7军农": "CCTV7",
+        "CCTV7农业": "CCTV7",
+        "CCTV7国防军事": "CCTV7",
+        "CCTV8电视剧": "CCTV8",
+        "CCTV9记录": "CCTV9",
+        "CCTV9纪录": "CCTV9",
+        "CCTV10科教": "CCTV10",
+        "CCTV11戏曲": "CCTV11",
+        "CCTV12社会与法": "CCTV12",
+        "CCTV13新闻": "CCTV13",
+        "CCTV新闻": "CCTV13",
+        "CCTV14少儿": "CCTV14",
+        "CCTV15音乐": "CCTV15",
+        "CCTV16奥林匹克": "CCTV16",
+        "CCTV17农业农村": "CCTV17",
+        "CCTV17农业": "CCTV17",
     }
     for old, new in replace_dict.items():
         name = name.replace(old, new)
     return name.lower()
-
-
-def get_channel_name_matches(query=None, choices=None, threshold=80):
-    """
-    Get channel name matches with rapidfuzz
-    """
-    query = format_channel_name(query)
-    matches = process.extract(query, choices, limit=len(choices))
-    threshold = 100 if "cctv" in query else threshold
-    filtered_matches = [match[0] for match in matches if match[1] >= threshold]
-    return filtered_matches
 
 
 def channel_name_is_equal(name1, name2):
@@ -137,23 +157,20 @@ def channel_name_is_equal(name1, name2):
         return True
     name1_format = format_channel_name(name1)
     name2_format = format_channel_name(name2)
-    matches = get_channel_name_matches(name1_format, [name2_format])
-    return len(matches) > 0
+    return name1_format == name2_format
 
 
 def get_channel_results_by_name(name, data):
     """
     Get channel results from data by name
     """
+    format_name = format_channel_name(name)
     cc = OpenCC("s2t")
-    name_s2t = cc.convert(name)
-    data_keys = data.keys()
-    name_matches_set = set(
-        get_channel_name_matches(name, data_keys)
-        + get_channel_name_matches(name_s2t, data_keys)
-    )
-    result = [item for name_match in name_matches_set for item in data[name_match]]
-    return result
+    name_s2t = cc.convert(format_name)
+    result1 = data.get(format_name, [])
+    result2 = data.get(name_s2t, [])
+    results = list(dict.fromkeys(result1 + result2))
+    return results
 
 
 def get_element_child_text_list(element, child_name):
@@ -203,11 +220,10 @@ def get_channel_multicast_name_region_type_result(result, names):
     """
     name_region_type_result = {}
     for name in names:
-        matches = get_channel_name_matches(name, result.keys())
-        for match in matches:
-            data = result.get(match)
-            if data and match not in name_region_type_result:
-                name_region_type_result[match] = data
+        format_name = format_channel_name(name)
+        data = result.get(format_name)
+        if data:
+            name_region_type_result[format_name] = data
     return name_region_type_result
 
 
@@ -215,7 +231,11 @@ def get_channel_multicast_region_type_list(result):
     """
     Get the channel multicast region type list from result
     """
-    config_region_list = set(config.get("Settings", "multicast_region_list").split(","))
+    config_region_list = set(
+        region.strip()
+        for region in config.get("Settings", "multicast_region_list").split(",")
+        if region.strip()
+    )
     region_type_list = {
         (region, type)
         for region_type in result.values()
@@ -239,7 +259,7 @@ def get_channel_multicast_result(result, search_result):
         info_list = [
             (
                 (
-                    f"http://{url}/rtp/{ip}$cache:{result_region}_{result_type}"
+                    f"http://{url}/rtp/{ip}$cache:{url}"
                     if open_sort
                     else f"http://{url}/rtp/{ip}"
                 ),
@@ -580,7 +600,7 @@ def append_all_method_data_keep_all(
 
 
 async def sort_channel_list(
-    cate, name, info_list, semaphore, ffmpeg=False, callback=None
+    cate, name, info_list, semaphore, ffmpeg=False, ipv6_proxy=None, callback=None
 ):
     """
     Sort the channel list
@@ -590,7 +610,7 @@ async def sort_channel_list(
         try:
             if info_list:
                 sorted_data = await sort_urls_by_speed_and_resolution(
-                    info_list, ffmpeg=ffmpeg, callback=callback
+                    info_list, ffmpeg=ffmpeg, ipv6_proxy=ipv6_proxy, callback=callback
                 )
                 if sorted_data:
                     for (
@@ -616,6 +636,13 @@ async def process_sort_channel_list(data, callback=None):
     Processs the sort channel list
     """
     open_ffmpeg = config.getboolean("Settings", "open_ffmpeg")
+    ipv_type = config.get("Settings", "ipv_type").lower()
+    open_ipv6 = "ipv6" in ipv_type or "all" in ipv_type or "全部" in ipv_type
+    ipv6_proxy = None
+    if open_ipv6:
+        ipv6_proxy = (
+            None if check_ipv6_support() else "http://www.ipv6proxy.net/go.php?u="
+        )
     ffmpeg_installed = is_ffmpeg_installed()
     if open_ffmpeg and not ffmpeg_installed:
         print("FFmpeg is not installed, using requests for sorting.")
@@ -629,6 +656,7 @@ async def process_sort_channel_list(data, callback=None):
                 info_list,
                 semaphore,
                 ffmpeg=is_ffmpeg,
+                ipv6_proxy=ipv6_proxy,
                 callback=callback,
             )
         )
@@ -678,7 +706,11 @@ def get_multicast_fofa_search_urls():
     """
     Get the fofa search urls for multicast
     """
-    config_region_list = config.get("Settings", "multicast_region_list").split(",")
+    config_region_list = [
+        region.strip()
+        for region in config.get("Settings", "multicast_region_list").split(",")
+        if region.strip()
+    ]
     rtp_file_names = []
     for filename in os.listdir(resource_path("config/rtp")):
         if filename.endswith(".txt") and "_" in filename:

@@ -10,6 +10,7 @@ import re
 from bs4 import BeautifulSoup
 from flask import render_template_string, send_file
 import shutil
+import requests
 
 
 def format_interval(t):
@@ -141,6 +142,23 @@ def is_ipv6(url):
         return False
 
 
+def check_ipv6_support():
+    """
+    Check if the system network supports ipv6
+    """
+    url = "https://ipv6.tokyo.test-ipv6.com/ip/?callback=?&testdomain=test-ipv6.com&testname=test_aaaa"
+    try:
+        print("Checking if your network supports IPv6...")
+        response = requests.get(url, timeout=15)
+        if response.status_code == 200:
+            print("Your network supports IPv6")
+            return True
+    except Exception:
+        pass
+    print("Your network does not support IPv6, using proxy instead")
+    return False
+
+
 def check_url_ipv_type(url):
     """
     Check if the url is compatible with the ipv type in the config
@@ -159,9 +177,10 @@ def check_by_domain_blacklist(url):
     Check by domain blacklist
     """
     domain_blacklist = [
-        urlparse(domain).netloc if urlparse(domain).scheme else domain
+        (parsed_domain.netloc if parsed_domain.scheme else stripped_domain)
         for domain in config.get("Settings", "domain_blacklist").split(",")
-        if domain.strip()
+        if (stripped_domain := domain.strip())
+        and (parsed_domain := urlparse(stripped_domain))
     ]
     return urlparse(url).netloc not in domain_blacklist
 
@@ -171,7 +190,7 @@ def check_by_url_keywords_blacklist(url):
     Check by URL blacklist keywords
     """
     url_keywords_blacklist = [
-        keyword
+        keyword.strip()
         for keyword in config.get("Settings", "url_keywords_blacklist").split(",")
         if keyword.strip()
     ]
@@ -212,9 +231,10 @@ def merge_objects(*objects):
                 elif isinstance(dict1[key], set):
                     dict1[key].update(value)
                 elif isinstance(dict1[key], list):
-                    dict1[key].extend(value)
-                    dict1[key] = list(set(dict1[key]))  # Remove duplicates
-                else:
+                    if value:
+                        dict1[key].extend(value)
+                        dict1[key] = list(set(dict1[key]))
+                elif value:
                     dict1[key] = {dict1[key], value}
             else:
                 dict1[key] = value
@@ -262,7 +282,10 @@ def convert_to_m3u():
                             str.strip, trimmed_line.split(",")
                         )
                         processed_channel_name = re.sub(
-                            r"(CCTV|CETV)-(\d+).*", r"\1\2", original_channel_name
+                            r"(CCTV|CETV)-(\d+)(\+.*)?",
+                            lambda m: f"{m.group(1)}{m.group(2)}"
+                            + ("+" if m.group(3) else ""),
+                            original_channel_name,
                         )
                         m3u_output += f'#EXTINF:-1 tvg-name="{processed_channel_name}" tvg-logo="https://live.fanmingming.com/tv/{processed_channel_name}.png"'
                         if current_group:
