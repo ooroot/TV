@@ -1,5 +1,61 @@
 # 更新日志（Changelog）
 
+## v1.4.9
+
+### 2024/10/11
+
+- 注意：本次更新涉及配置变更，请以最新 config/config.ini 为准，工作流使用 user_config.ini 或 docker 挂载的用户请及时更新配置文件
+- 新增支持 docker arm64 镜像（#369）
+- 新增分辨率过滤功能（相关配置：open_filter_resolution，min_resolution）
+- 新增显示更新时间（相关配置：open_update_time）
+- 优化测速效率（#359）
+- 优化权重值选择交互
+- 调整默认模板，增加默认订阅源
+- 移除央视台球部分错误组播地址
+- 更新使用教程
+
+- Warning: This update involves configuration changes. Please refer to the latest config.ini. Users of workflow using user_config.ini or Docker mounted configurations should update their configuration files promptly
+- Add support for Docker ARM64 images (#369)
+- Add resolution filtering feature (related configurations: open_filter_resolution, min_resolution)
+- Add display of update time (related configuration: open_update_time)
+- Optimize speed testing efficiency (#359)
+- Optimize weight value selection interaction
+- Adjust the default template and add default subscription sources
+- Remove the incorrect multicast addresses for the CCTV Snooker section
+- Update usage guide
+
+## v1.4.8
+
+### 2024/09/27
+
+- 默认模板增加部分频道：咪咕直播、央视付费频道、电影频道、港澳台、地方频道等
+- 订阅源增加默认订阅地址
+- 优化订阅源、在线搜索测速效率
+- 增加汕头频道组播
+- 调整默认接口数量为 30
+
+- Add some channels to the default template: Migu Live, CCTV Pay Channels, Movie Channel, Hong Kong and Macau Channels, Local Channels, etc
+- Add default subscription addresses to the subscription source
+- Optimize the efficiency of subscription source and online search speed tests
+- Add Shantou channel multicast
+- Adjust the default number of interfaces to 30
+
+## v1.4.7
+
+### 2024/09/26
+
+- 修复部分设备本地运行软件 driver 问题(#335)
+- 修复 driver 模式下新版谷歌浏览器白屏问题
+- 增加历史结果缓存(result_cache.pkl)，用于测速优化
+- 重构测速方法，提升测速效率
+- 优化测速进度条显示
+
+- Fix some issues with local software driver operation on certain devices (#335)
+- Fix the white screen issue with the new version of Google Chrome in driver mode
+- Add historical result cache (result_cache.pkl) for performance optimization
+- Refactor speed test methods to improve efficiency
+- Optimize speed test progress bar display
+
 ## v1.4.6
 
 ### 2024/9/20

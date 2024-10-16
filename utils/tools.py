@@ -110,11 +110,32 @@ def get_soup(source):
     return soup
 
 
+def get_resolution_value(resolution_str):
+    """
+    Get resolution value from string
+    """
+    pattern = r"(\d+)[xX*](\d+)"
+    match = re.search(pattern, resolution_str)
+    if match:
+        width, height = map(int, match.groups())
+        return width * height
+    else:
+        return 0
+
+
 def get_total_urls_from_info_list(infoList):
     """
     Get the total urls from info list
     """
-    total_urls = [url for url, _, _ in infoList]
+    open_filter_resolution = config.getboolean("Settings", "open_filter_resolution")
+    min_resolution = get_resolution_value(config.get("Settings", "min_resolution"))
+    total_urls = []
+    for url, _, resolution in infoList:
+        if open_filter_resolution and resolution:
+            resolution_value = get_resolution_value(resolution)
+            if resolution_value < min_resolution:
+                continue
+        total_urls.append(url)
     return list(dict.fromkeys(total_urls))[: config.getint("Settings", "urls_limit")]
 
 
@@ -149,7 +170,7 @@ def check_ipv6_support():
     url = "https://ipv6.tokyo.test-ipv6.com/ip/?callback=?&testdomain=test-ipv6.com&testname=test_aaaa"
     try:
         print("Checking if your network supports IPv6...")
-        response = requests.get(url, timeout=15)
+        response = requests.get(url, timeout=10)
         if response.status_code == 200:
             print("Your network supports IPv6")
             return True
@@ -294,7 +315,7 @@ def convert_to_m3u():
             m3u_file_path = os.path.splitext(resource_path(user_final_file))[0] + ".m3u"
             with open(m3u_file_path, "w", encoding="utf-8") as m3u_file:
                 m3u_file.write(m3u_output)
-            print(f"result m3u file generated at: {m3u_file_path}")
+            print(f"Result m3u file generated at: {m3u_file_path}")
 
 
 def get_result_file_content(show_result=False):
@@ -312,3 +333,61 @@ def get_result_file_content(show_result=False):
         "<head><link rel='icon' href='{{ url_for('static', filename='images/favicon.ico') }}' type='image/x-icon'></head><pre>{{ content }}</pre>",
         content=content,
     )
+
+
+def remove_duplicates_from_tuple_list(tuple_list, seen, flag=None):
+    """
+    Remove duplicates from tuple list
+    """
+    unique_list = []
+    for item in tuple_list:
+        part = item[0] if flag is None else item[0].rsplit(flag, 1)[-1]
+        if part not in seen:
+            seen.add(part)
+            unique_list.append(item)
+    return unique_list
+
+
+def process_nested_dict(data, seen, flag=None):
+    """
+    Process nested dict
+    """
+    for key, value in data.items():
+        if isinstance(value, dict):
+            process_nested_dict(value, seen, flag)
+        elif isinstance(value, list):
+            data[key] = remove_duplicates_from_tuple_list(value, seen, flag)
+
+
+ip_pattern = re.compile(
+    r"""
+    (
+        (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})       # IPv4
+        |([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})            # Domain
+        |(\[([0-9a-fA-F:]+)\])                     # IPv6
+    )
+    (?::(\d+))?                                    # Port
+    """,
+    re.VERBOSE,
+)
+
+
+def get_ip(url):
+    """
+    Get the IP address with flags
+    """
+    matcher = ip_pattern.search(url)
+    if matcher:
+        return matcher.group(1)
+    return None
+
+
+def format_url_with_cache(url):
+    """
+    Format the URL with cache
+    """
+    ip = get_ip(url)
+    if ip:
+        return f"{url}$cache:{ip}"
+    else:
+        return url

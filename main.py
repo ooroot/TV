@@ -1,5 +1,5 @@
 import asyncio
-from utils.config import config
+from utils.config import config, resource_path
 from utils.channel import (
     get_channel_items,
     append_total_data,
@@ -7,6 +7,8 @@ from utils.channel import (
     write_channel_to_file,
     setup_logging,
     cleanup_logging,
+    get_channel_data_cache_with_compare,
+    format_channel_url_info,
 )
 from utils.tools import (
     update_file,
@@ -14,6 +16,8 @@ from utils.tools import (
     get_ip_address,
     convert_to_m3u,
     get_result_file_content,
+    process_nested_dict,
+    format_interval,
 )
 from updates.subscribe import get_channels_by_subscribe_urls
 from updates.multicast import get_channels_by_multicast
@@ -28,6 +32,8 @@ from flask import Flask, render_template_string
 import sys
 import shutil
 import atexit
+import pickle
+import copy
 
 app = Flask(__name__)
 
@@ -119,15 +125,12 @@ class UpdateSource:
             )
 
     def get_urls_len(self, filter=False):
-        def process_cache_url(url):
-            if filter and "$cache:" in url:
-                cache_part = url.split("$cache:", 1)[1]
-                return cache_part.split("?")[0]
-            return url
-
+        data = copy.deepcopy(self.channel_data)
+        if filter:
+            process_nested_dict(data, seen=set(), flag="$cache:")
         processed_urls = set(
-            process_cache_url(url_info[0])
-            for channel_obj in self.channel_data.values()
+            url_info[0]
+            for channel_obj in data.values()
             for url_info_list in channel_obj.values()
             for url_info in url_info_list
         )
@@ -135,6 +138,7 @@ class UpdateSource:
 
     async def main(self):
         try:
+            main_start_time = time()
             self.channel_items = get_channel_items()
             channel_names = [
                 name
@@ -144,7 +148,7 @@ class UpdateSource:
             await self.visit_page(channel_names)
             self.tasks = []
             channel_items_obj_items = self.channel_items.items()
-            self.channel_data = append_total_data(
+            append_total_data(
                 channel_items_obj_items,
                 self.channel_data,
                 self.hotel_fofa_result,
@@ -153,11 +157,15 @@ class UpdateSource:
                 self.subscribe_result,
                 self.online_search_result,
             )
-            self.total = self.get_urls_len(filter=True)
-            sort_callback = lambda: self.pbar_update(name="测速")
-            if config.getboolean("Settings", "open_sort"):
+            urls_total = self.get_urls_len()
+            channel_data_cache = copy.deepcopy(self.channel_data)
+            open_sort = config.getboolean("Settings", "open_sort")
+            if open_sort:
+                self.total = self.get_urls_len(filter=True)
+                print(f"Total urls: {urls_total}, need to sort: {self.total}")
+                sort_callback = lambda: self.pbar_update(name="测速")
                 self.update_progress(
-                    f"正在测速排序, 共{self.total}个接口",
+                    f"正在测速排序, 共{urls_total}个接口, {self.total}个接口需要进行测速",
                     0,
                 )
                 self.start_time = time()
@@ -166,6 +174,8 @@ class UpdateSource:
                     self.channel_data,
                     callback=sort_callback,
                 )
+            else:
+                format_channel_url_info(self.channel_data)
             self.total = self.get_urls_len()
             self.pbar = tqdm(total=self.total, desc="Writing")
             self.start_time = time()
@@ -184,7 +194,16 @@ class UpdateSource:
                     else "result.txt"
                 )
                 shutil.copy(user_final_file, result_file)
-            if config.getboolean("Settings", "open_sort"):
+            if config.getboolean("Settings", "open_use_old_result"):
+                if open_sort:
+                    get_channel_data_cache_with_compare(
+                        channel_data_cache, self.channel_data
+                    )
+                with open(
+                    resource_path("output/result_cache.pkl", persistent=True), "wb"
+                ) as file:
+                    pickle.dump(channel_data_cache, file)
+            if open_sort:
                 user_log_file = "output/" + (
                     "user_result.log"
                     if os.path.exists("config/user_config.ini")
@@ -192,12 +211,15 @@ class UpdateSource:
                 )
                 update_file(user_log_file, "output/result_new.log", copy=True)
             convert_to_m3u()
-            print(f"Update completed! Please check the {user_final_file} file!")
+            total_time = format_interval(time() - main_start_time)
+            print(
+                f"Update completed! Total time spent: {total_time}. Please check the {user_final_file} file!"
+            )
             if self.run_ui:
                 tip = (
-                    "服务启动成功, 可访问以下链接:"
+                    "服务启动成功, 可使用以下链接观看直播:"
                     if config.getboolean("Settings", "open_update") == False
-                    else f"更新完成, 请检查{user_final_file}文件, 可访问以下链接:"
+                    else f"更新完成, 耗时: {total_time}, 请检查{user_final_file}文件, 可使用以下链接观看直播:"
                 )
                 self.update_progress(
                     tip,
@@ -239,7 +261,10 @@ def scheduled_task():
 
 def run_app():
     if not os.environ.get("GITHUB_ACTIONS"):
-        print(f"You can access the result at {get_ip_address()}")
+        ip_address = get_ip_address()
+        print(f"You can use this url to watch the live stream: {ip_address}")
+        print(f"Result detail: {ip_address}/result")
+        print(f"Log detail: {ip_address}/log")
         app.run(host="0.0.0.0", port=8000)
 
 

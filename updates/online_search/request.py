@@ -5,7 +5,12 @@ from utils.channel import (
     get_results_from_soup,
     get_results_from_soup_requests,
 )
-from utils.tools import check_url_by_patterns, get_pbar_remaining, get_soup
+from utils.tools import (
+    check_url_by_patterns,
+    get_pbar_remaining,
+    get_soup,
+    format_url_with_cache,
+)
 from utils.config import config
 from updates.proxy import get_proxy, get_proxy_next
 from time import time
@@ -60,6 +65,7 @@ async def get_channels_by_online_search(names, callback=None):
     def process_channel_by_online_search(name):
         nonlocal proxy, open_proxy, open_driver, page_num
         info_list = []
+        driver = None
         try:
             if open_driver:
                 driver = setup_driver(proxy)
@@ -160,6 +166,7 @@ async def get_channels_by_online_search(names, callback=None):
                             for result in results:
                                 url, date, resolution = result
                                 if url and check_url_by_patterns(url):
+                                    url = format_url_with_cache(url)
                                     info_list.append((url, date, resolution))
                             break
                         else:
@@ -179,7 +186,7 @@ async def get_channels_by_online_search(names, callback=None):
             print(f"{name}:Error on search: {e}")
             pass
         finally:
-            if open_driver:
+            if driver:
                 driver.close()
                 driver.quit()
             pbar.update()
