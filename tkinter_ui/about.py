@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import webbrowser
-from utils.config import resource_path
+from utils.tools import resource_path
 
 
 class AboutUI:
@@ -9,7 +9,7 @@ class AboutUI:
         about_window = tk.Toplevel(root)
         about_window.title("关于")
         about_window_width = 430
-        about_window_height = 430
+        about_window_height = 480
 
         version_frame = tk.Frame(about_window)
         version_frame.pack(side=tk.TOP, fill=tk.X)
@@ -44,14 +44,14 @@ class AboutUI:
         project_label.pack()
         project_link = tk.Label(
             project_row_column2,
-            text="https://github.com/Guovin/TV",
+            text="https://github.com/Guovin/iptv-api",
             fg="blue",
             cursor="hand2",
         )
         project_link.pack()
         project_link.bind(
             "<Button-1>",
-            lambda e: webbrowser.open_new_tab("https://github.com/Guovin/TV"),
+            lambda e: webbrowser.open_new_tab("https://github.com/Guovin/iptv-api"),
         )
 
         disclaimer_label = tk.Label(
@@ -62,13 +62,15 @@ class AboutUI:
         disclaimer_label.pack()
 
         image = Image.open(resource_path("static/images/alipay.jpg"))
-        resized_image = image.resize((250, 250))
+        resized_image = image.resize((250, 300))
         photo = ImageTk.PhotoImage(resized_image)
         image_label = tk.Label(about_window, image=photo)
         image_label.image = photo
         image_label.pack()
 
-        appreciate_label = tk.Label(about_window, text="请我喝杯咖啡☕️吧~")
+        appreciate_label = tk.Label(
+            about_window, text="开发维护不易，请我喝杯咖啡☕️吧~"
+        )
         appreciate_label.pack()
 
         confirm_button = tk.ttk.Button(

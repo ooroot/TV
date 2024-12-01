@@ -3,15 +3,62 @@ from time import time
 import asyncio
 import re
 from utils.config import config
-from utils.tools import is_ipv6, get_resolution_value
+import utils.constants as constants
+from utils.tools import is_ipv6, remove_cache_info, get_resolution_value, get_logger
 import subprocess
+import yt_dlp
+from concurrent.futures import ProcessPoolExecutor
+import functools
 
-timeout = config.getint("Settings", "sort_timeout", fallback=5)
+logger = get_logger(constants.log_path)
 
 
-async def get_speed(url, timeout=timeout, proxy=None):
+def get_info_yt_dlp(url, timeout=config.sort_timeout):
     """
-    Get the speed of the url
+    Get the url info by yt_dlp
+    """
+    ydl_opts = {
+        "socket_timeout": timeout,
+        "skip_download": True,
+        "quiet": True,
+        "no_warnings": True,
+        "format": "best",
+        "logger": logger,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        return ydl.sanitize_info(ydl.extract_info(url, download=False))
+
+
+async def get_speed_yt_dlp(url, timeout=config.sort_timeout):
+    """
+    Get the speed of the url by yt_dlp
+    """
+    try:
+        async with asyncio.timeout(timeout + 2):
+            start_time = time()
+            loop = asyncio.get_running_loop()
+            with ProcessPoolExecutor() as exc:
+                info = await loop.run_in_executor(
+                    exc, functools.partial(get_info_yt_dlp, url, timeout)
+                )
+                fps = (
+                    int(round((time() - start_time) * 1000))
+                    if len(info)
+                    else float("inf")
+                )
+                resolution = (
+                    f"{info['width']}x{info['height']}"
+                    if "width" in info and "height" in info
+                    else None
+                )
+                return (fps, resolution)
+    except:
+        return (float("inf"), None)
+
+
+async def get_speed_requests(url, timeout=config.sort_timeout, proxy=None):
+    """
+    Get the speed of the url by requests
     """
     async with ClientSession(
         connector=TCPConnector(verify_ssl=False), trust_env=True
@@ -45,7 +92,7 @@ def is_ffmpeg_installed():
         return False
 
 
-async def ffmpeg_url(url, timeout=timeout):
+async def ffmpeg_url(url, timeout=config.sort_timeout):
     """
     Get url info by ffmpeg
     """
@@ -105,105 +152,81 @@ async def check_stream_speed(url_info):
         frame, resolution = get_video_info(video_info)
         if frame is None or frame == float("inf"):
             return float("inf")
-        if resolution:
-            url_info[0] = add_info_url(url, resolution)
         url_info[2] = resolution
-        return (tuple(url_info), frame)
+        return (url_info, frame)
     except Exception as e:
         print(e)
         return float("inf")
 
 
-def add_info_url(url, info):
-    """
-    Format the url
-    """
-    separator = "|" if "$" in url else "$"
-    url += f"{separator}{info}"
-    return url
-
-
 speed_cache = {}
 
 
-async def get_speed_by_info(
-    url_info, ffmpeg, semaphore, ipv6_proxy=None, callback=None
-):
+async def get_speed(url, ipv6_proxy=None, callback=None):
     """
-    Get the info with speed
+    Get the speed of the url
     """
-    async with semaphore:
-        url, _, resolution, _ = url_info
-        url_info = list(url_info)
+    try:
         cache_key = None
-        if "$" in url:
-            url, cache_info = url.split("$", 1)
-            if "cache:" in cache_info:
-                matcher = re.search(r"cache:(.*)", cache_info)
-                if matcher:
-                    cache_key = matcher.group(1)
         url_is_ipv6 = is_ipv6(url)
-        if url_is_ipv6:
-            url = add_info_url(url, "IPv6")
-        url_info[0] = url
+        if "$" in url:
+            url, _, cache_info = url.partition("$")
+            matcher = re.search(r"cache:(.*)", cache_info)
+            if matcher:
+                cache_key = matcher.group(1)
         if cache_key in speed_cache:
-            speed = speed_cache[cache_key][0]
-            url_info[2] = speed_cache[cache_key][1]
-            return (tuple(url_info), speed) if speed != float("inf") else float("inf")
-        try:
-            if ipv6_proxy and url_is_ipv6:
-                url = ipv6_proxy + url
-            if ffmpeg:
-                speed = await check_stream_speed(url_info)
-                url_speed = speed[1] if speed != float("inf") else float("inf")
-                if url_speed == float("inf"):
-                    url_speed = await get_speed(url)
-                resolution = speed[0][2] if speed != float("inf") else None
-            else:
-                url_speed = await get_speed(url)
-                speed = (
-                    (tuple(url_info), url_speed)
-                    if url_speed != float("inf")
-                    else float("inf")
-                )
-            if cache_key and cache_key not in speed_cache:
-                speed_cache[cache_key] = (url_speed, resolution)
-            return speed
-        except Exception:
-            return float("inf")
-        finally:
-            if callback:
-                callback()
+            return speed_cache[cache_key][0]
+        if ipv6_proxy and url_is_ipv6:
+            speed = 0
+        else:
+            speed = await get_speed_yt_dlp(url)
+        if cache_key and cache_key not in speed_cache:
+            speed_cache[cache_key] = speed
+        return speed
+    except:
+        return float("inf")
+    finally:
+        if callback:
+            callback()
 
 
-response_time_weight = config.getfloat("Settings", "response_time_weight", fallback=0.5)
-resolution_weight = config.getfloat("Settings", "resolution_weight", fallback=0.5)
-
-
-async def sort_urls_by_speed_and_resolution(
-    data, ffmpeg=False, ipv6_proxy=None, callback=None
-):
+def sort_urls_by_speed_and_resolution(name, data, logger=None):
     """
     Sort by speed and resolution
     """
-    semaphore = asyncio.Semaphore(20)
-    response = await asyncio.gather(
-        *(
-            get_speed_by_info(
-                url_info, ffmpeg, semaphore, ipv6_proxy=ipv6_proxy, callback=callback
-            )
-            for url_info in data
-        )
-    )
-    valid_response = [res for res in response if res != float("inf")]
+    filter_data = []
+    for url, date, resolution, origin in data:
+        if origin == "important":
+            filter_data.append((url, date, resolution, origin))
+            continue
+        cache_key_match = re.search(r"cache:(.*)", url.partition("$")[2])
+        cache_key = cache_key_match.group(1) if cache_key_match else None
+        if cache_key and cache_key in speed_cache:
+            cache = speed_cache[cache_key]
+            if cache:
+                response_time, cache_resolution = cache
+                resolution = cache_resolution or resolution
+                if response_time != float("inf"):
+                    url = remove_cache_info(url)
+                    try:
+                        if logger:
+                            logger.info(
+                                f"Name: {name}, URL: {url}, Date: {date}, Resolution: {resolution}, Response Time: {response_time} ms"
+                            )
+                    except Exception as e:
+                        print(e)
+                    filter_data.append((url, date, resolution, origin))
 
     def combined_key(item):
-        (_, _, resolution), response_time = item
-        resolution_value = get_resolution_value(resolution) if resolution else 0
-        return (
-            -(response_time_weight * response_time)
-            + resolution_weight * resolution_value
-        )
+        _, _, resolution, origin = item
+        if origin == "important":
+            return -float("inf")
+        else:
+            resolution_value = get_resolution_value(resolution) if resolution else 0
+            return (
+                config.response_time_weight * response_time
+                - config.resolution_weight * resolution_value
+            )
 
-    sorted_res = sorted(valid_response, key=combined_key, reverse=True)
-    return sorted_res
+    filter_data.sort(key=combined_key)
+    return filter_data

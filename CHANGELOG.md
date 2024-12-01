@@ -1,5 +1,166 @@
 # 更新日志（Changelog）
 
+## v1.5.4
+
+### 2024/11/29
+
+- ⚠️ Python 升级至 3.13，该版本已不支持 Win7，若有需要请使用 v1.5.3
+- ⚠️ Github 仓库改名：iptv-api，使用旧接口地址请及时更换新地址
+- ⚠️ Docker 新镜像仓库启用：guovern/iptv-api（旧版的 tv-driver 改为：guovern/iptv-api:latest，tv-requests 改为 guovern/iptv-api:lite），iptv-api:latest 为完整版、iptv-api:lite 为精简版，请使用新的名称命令进行拉取，旧仓库将不再维护
+- ❤️ 新增微信公众号关注途径（公众号搜索：Govin），推荐关注公众号，可订阅更新通知与使用技巧等文章推送，还可进行交流讨论
+- ✨ 更换测速方法（yt-dlp），重构测速逻辑，提升准确性、稳定性与效率，减小接口切换延迟（#563）
+- ✨ 新增支持 ARM v7（#562）
+- ✨ 新增双结果 API 访问（ip/m3u, ip/txt）（#581）
+- ✨ 新增启动 API 服务命令（pipenv run service）
+- 🪄 优化 Docker 镜像大小（完整版：-25%，精简版：-66%）
+- 🐛 修复部分播放器不支持的信息间隔符（#581）
+
+<details>
+  <summary>English</summary>
+
+- ⚠️ Python has been upgraded to version 3.13, which no longer supports Win7. If needed, please use version v1.5.3.
+- ⚠️ The GitHub repository has been renamed to iptv-api. If you are using the old API address, please update it to the new one promptly.
+- ⚠️ New Docker image repository is now active: guovern/iptv-api (the old tv-driver is now guovern/iptv-api:latest, and tv-requests is now guovern/iptv-api:lite). iptv-api:latest is the full version, and iptv-api:lite is the lightweight version. Please use the new names to pull the images, as the old repository will no longer be maintained.
+- ❤️ A new way to follow the WeChat official account (search for: Govin) has been added. It is recommended to follow the official account to subscribe to update notifications, usage tips, and engage in discussions.
+- ✨ The speed measurement method has been changed to yt-dlp, and the speed measurement logic has been refactored to improve accuracy, stability, and efficiency, reducing interface switching delay (#563).
+- ✨ Support for ARM v7 has been added (#562).
+- ✨ Dual result API access (ip/m3u, ip/txt) has been added (#581).
+- ✨ A command to start the API service (pipenv run service) has been added.
+- 🪄 The size of the Docker image has been optimized (Full version: -25%, Lite version: -66%).
+- 🐛 Fixed the information delimiter issue for some players that do not support it (#581).
+
+</details>
+
+## v1.5.3
+
+### 2024/11/19
+
+⚠️ 这将是支持 Win7 的最后一个版本
+
+- 🐛 修复 GUI “显示无结果分类”设置后保存失败（#564）
+- 🐛 修复命令行启动报错 (#567）
+
+<details>
+  <summary>English</summary>
+
+⚠️ This will be the last version supporting Win7
+
+- 🐛 Fixed the issue where the GUI setting for "Display No Results Category" failed to save (#564).
+- 🐛 Fixed the error when starting from the command line (#567).
+
+</details>
+
+## v1.5.2
+
+### 2024/11/15
+
+- ✨ 新增各省份地方台
+- ✨ 新增控制显示无结果频道分类配置（open_empty_category）（#551）
+- ✨ 调整接口源（#526）
+- 🪄 优化频道数据插入速度
+- 🪄 优化 IPv6 测速逻辑，解决无结果问题
+- 🪄 优化页面服务启动与 docker 定时任务日志输出
+- 🪄 调整默认配置：接口数量 urls_limit=10 等数量配置，增加订阅源
+- 🐛 修复运行停止问题（#527）
+- 🐛 修复 Win7 GUI 启动问题（#536）
+- 🗑️ 移除部分无效订阅源
+- 🗑️ 移除域名黑名单配置（domain_blacklist），请使用接口关键字黑名单（url_keywords_blacklist）替代
+
+<details>
+  <summary>English</summary>
+
+- ✨ Added local channels for each province.
+- ✨ Added configuration to control the display of the No Results Channel Category (open_empty_category) (#551).
+- ✨ Adjusted interface sources (#526).
+- 🪄 Optimized the speed of channel data insertion.
+- 🪄 Optimized IPv6 speed test logic to resolve no results issues.
+- 🪄 Optimized page service startup and Docker scheduled task log output.
+- 🪄 Adjusted default configurations: number of interfaces urls_limit=10, etc., and added subscription sources.
+- 🐛 Fixed the issue of the program stopping (#527).
+- 🐛 Fixed the issue of Win7 GUI startup (#536).
+- 🗑️ Removed some invalid subscription sources.
+- 🗑️ Removed the domain blacklist configuration (domain_blacklist). Please use the interface keyword blacklist (url_keywords_blacklist) instead.
+
+</details>
+
+## v1.5.1
+
+### 2024/11/5
+
+- ✨ 新增频道接口白名单：不参与测速，永远保留在结果最前面（#470）
+  使用方法：
+  1. 模板频道接口地址后添加$!即可实现（如：广东珠江,http://xxx.m3u$! ）
+  2. 额外信息补充（如：广东珠江,http://xxx.m3u$!额外信息 ），更多接口白名单请至https://github.com/Guovin/iptv-api/issues/514 讨论
+- ✨ 新增 🈳 无结果频道分类：无结果频道默认归类至该底部分类下（#473）
+- ✨ 接口地址增加来源类型说明
+- ✨ 默认模板增加广东民生（#481）、广州综合（#504）
+- 🪄 优化偏好结果输出
+- 🪄 重构配置读取与增加全局常量
+- 🐛 修复部分接口匹配失败问题
+- 🐛 修复更新结果为空等问题（#464，#467）
+- 🐛 修复接口地址复制空格问题（#472 by:@haohaitao）
+- 🐛 修复结果日志 unpack error
+- 🐛 修复结果接口信息为空问题（#505）
+- 🗑️ 移除仓库根目录 txt 结果文件，请至 output 目录下查看结果文件
+
+<details>
+  <summary>English</summary>
+
+- ✨ Added channel interface whitelist: Not participating in speed testing, always kept at the very front of the results. (#470)
+  Usage:
+  1. Add $! after the template channel interface address (e.g., Guangdong Pearl River, http://xxx.m3u$!).
+  2. Additional information can be appended (e.g., Guangdong Pearl River, http://xxx.m3u$! Additional Information) (#470). For more interface whitelists, please discuss at https://github.com/Guovin/iptv-api/issues/514.
+- ✨ Added 🈳 No Results Channel Category: Channels without results are categorized under this bottom category by default (#473).
+- ✨ Interface addresses now include source type descriptions.
+- ✨ Default templates now include Guangdong People's Livelihood (#481) and Guangzhou Comprehensive (#504).
+- 🪄 Optimized preferred result output.
+- 🪄 Refactored configuration reading and added global constants.
+- 🐛 Fixed issues with partial interface matching failures.
+- 🐛 Fixed problems with empty update results, etc. (#464, #467).
+- 🐛 Fixed the issue of spaces being copied with the interface address (#472 by:@haohaitao).
+- 🐛 Fixed the unpack error in result logs.
+- 🐛 Fixed the issue of empty interface information in results (#505).
+- 🗑️ Removed txt result files from the repository root directory. Please check the result files in the output directory.
+</details>
+
+## v1.5.0
+
+### 2024/10/25
+
+- ✨🛠 新增结果偏好设置：
+
+  1. 接口来源优先级（origin_type_prefer）与数量设置（hotel_num, multicast_num, subscribe_num, online_search_num）
+  2. IPv 类型优先级（ipv_type_prefer）与数量设置（ipv4_num, ipv6_num）
+
+- ✨🛠 新增控制接口测速超时时间（sort_timeout）（#388）
+- ✨🛠 新增控制是否开启页面服务（open_service）（青龙等平台可使用该配置实现任务执行完成后停止运行）
+- ✨🛠 新增控制是否显示接口相关信息（open_url_info）（#431）
+- ✨ 新增支持 m3u 地址订阅源（#389）
+- ✨ 新增 🏛 经典剧场
+- 🪄 优化 Docker ARM64 FFmpeg 支持（部分 ARM 设备无法运行 driver 镜像建议使用 requests 镜像）
+- 🪄 优化组播获取非数值域名 ip 地址（#410）
+- 🪄 优化使用旧配置文件时可能出现的新参数不存在报错问题，使用默认值
+- 🐛 修复对于非规范 txt 文本转换 m3u 报错问题（#422）
+- 🐛 修复 IPv6 接口获取失败问题（#452）
+
+<details>
+  <summary>English</summary>
+
+- ✨🛠 Added result preference settings:
+  1. Source priority (origin_type_prefer) and quantity settings (hotel_num, multicast_num, subscribe_num, online_search_num)
+  2. IPv type priority (ipv_type_prefer) and quantity settings (ipv4_num, ipv6_num)
+- ✨🛠 Added control for API speed test timeout (sort_timeout) (#388)
+- ✨🛠 Added control to enable or disable page service (open_service) (this configuration can be used on platforms like QingLong to stop running after task completion)
+- ✨🛠 Added control to show or hide API related information (open_url_info) (#431)
+- ✨ Added support for m3u address subscription sources (#389)
+- ✨ Added 🏛 Classic Theater
+- 🪄 Optimized Docker ARM64 FFmpeg support (it is recommended to use the requests image for some ARM devices that cannot run the driver image)
+- 🪄 Optimized obtaining non-numeric domain IP addresses for multicast (#410)
+- 🪄 Optimize the issue of non-existent new parameters when using old configuration files, use default values
+- 🐛 Fixed issues with converting non-standard txt files to m3u format (#422)
+- 🐛 Fixed issues with failing to obtain IPv6 interface information (#452)
+</details>
+
 ## v1.4.9
 
 ### 2024/10/11
