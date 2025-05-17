@@ -1,8 +1,102 @@
 # 更新日志（Changelog）
 
+## v1.7.1
+
+### 2025/5/9
+
+### 🚀 新功能 ###
+
+---
+
+- 新增支持获取接口`归属地`与`运营商`（利用`纯真IP数据库`实现），支持关键字过滤，可通过配置`location`与`isp`
+  生成想要的结果，建议优先使用靠近使用环境的归属地与本机网络运营商，以提升播放效果（#1058）
+- 新增支持无需开启测速的情况下，可对接口进行`排序`，输出结果日志
+
+### 🌟 优化 ###
+
+---
+
+- 优化`IPv6`结果进入缓存
+- 调整`冻结结果的阈值`，加入`最大延迟`与`最小速率`限制
+- 调整默认配置`ipv_type_prefer = auto`，即根据网络环境自动选择排序IPv4与IPv6结果的优先级
+- 频道结果日志文件更名为`result.log`
+- 更新部分配置参数描述
+
+### 🐛 修复 ###
+
+---
+
+- 修复`IPv6含参数结果`匹配问题（#1048）
+- 修复白名单生成结果失败（#1055）
+
+### 🗑️ 移除 ###
+
+---
+
+- 移除无效的`IPv6订阅源`
+
+> [!NOTE]
+> 有小伙伴对部署后首次更新时间变长有疑问，其实这是正常的。
+> 因为从`v1.7.0`开始，为了提升频道测速准确性，默认对接口进行全量测速。
+> 目前首次运行一般`30分钟`左右，如果是新增的频道比较多首次运行时间会比较长。
+> 但这并不会影响使用，由于默认模板已经内置了部分更新结果（`output/cache.pkl.gz`），部署后可立即访问使用。
+> 同时测速阶段可根据历史数据跳过无效接口，无需担心，后续更新所需时间会明显减少。
+> 如果你介意，可开启Host共享模式（`speed_test_filter_host = True`），相同Host的接口会共享测速结果，可以大幅降低测速所需时间，但结果准确性也会下降。
+
+<details>
+  <summary>English</summary>
+
+### 🚀 New Features ###
+
+---
+
+- Added support for obtaining interface `location` and `ISP` (implemented using the `IPIP database`), supports keyword
+  filtering. You can configure `location` and `isp` to generate desired results. It is recommended to prioritize the
+  location and ISP close to the usage environment to improve playback performance (#1058).
+- Added support for sorting interfaces and outputting result logs without enabling speed testing.
+
+### 🌟 Optimizations ###
+
+---
+
+- Optimized caching of `IPv6` results.
+- Adjusted the `frozen result threshold` by adding `maximum latency` and `minimum speed` limits.
+- Adjusted the default configuration `ipv_type_prefer = auto`, which automatically prioritizes sorting of IPv4 and IPv6
+  results based on the network environment.
+- Renamed the channel result log file to `result.log`.
+- Updated descriptions of some configuration parameters.
+
+### 🐛 Bug Fixes ###
+
+---
+
+- Fixed the issue with matching `IPv6 results with parameters` (#1048).
+- Fixed the failure to generate whitelist results (#1055).
+
+### 🗑️ Removals ###
+
+---
+
+- Removed invalid `IPv6 subscription sources`.
+
+> [!NOTE]
+> Some users have raised concerns about the longer initial update time after deployment. This is actually normal.
+> Starting from `v1.7.0`, to improve the accuracy of channel speed tests,
+> full speed testing of interfaces is enabled by default.
+> The first run usually takes about `30 minutes`. If there are many new channels, the initial run time may be longer.
+> However, this does not affect usage, as the default template already includes some pre-updated results
+> (`output/cache.pkl.gz`), allowing immediate access after deployment.
+> During the speed test phase, invalid interfaces can be skipped based on historical data, so there is no need to worry.
+> Subsequent updates will take significantly less time.
+> If you are concerned, you can enable Host sharing mode (`speed_test_filter_host = True`), where interfaces with the
+> same Host share speed test results. This can greatly reduce the time required for speed testing,
+> but the accuracy of the results may decrease.
+
+</details>
+
 ## v1.7.0
 
-### 2025/4/30
+### 2025/5/1
 
 ### 🚀 新功能 ###
 
@@ -11,6 +105,7 @@
 - 新增`频道别名`功能（`config/alias.txt`），提升频道名称匹配能力
 - 新增`EPG`功能（订阅文件配置`config/epg.txt`），显示频道预告信息
 - 支持`回放类接口`获取与生成
+- 新增`历史结果`的冻结与解冻，`冻结`：无效结果不参与测速，`解冻`：无结果时自动解冻重新测速
 - 新增`最大分辨率`限制`min_resolution`
 - 支持含`请求头`信息接口测速与生成，需播放器支持才可播放，可通过`open_headers`控制是否开启
 - 新增测速并发数量配置`speed_test_limit`，实现控制测速负载压力
@@ -23,7 +118,6 @@
 
 - 重构`测速与排序`逻辑，适配更多类型接口的测速（#1009）
 - 提供`内置结果`，解决首次运行等待期间无结果问题（可能不稳定，建议使用更新后结果）
-- 优化`历史结果`的使用，过滤历史无效接口，不再参与测速
 - 优化接口测速默认为`全接口测速`，解决Host共享结果部分接口测速不准确问题
 - 调整测速结果以`速率`排序，`分辨率`不再参与，解决部分低速率接口在前的问题
 - 默认开启`推流`，调整`HLS`分片配置，推荐使用`HLS`接口，缓解卡顿情况
@@ -60,6 +154,8 @@
 - Added `Channel Alias` feature (`config/alias.txt`) to improve channel name matching.
 - Added `EPG` feature (subscription file configuration `config/epg.txt`) to display channel program information.
 - Support for `Playback Interface` retrieval and generation.
+- Added `historical results` freezing and unfreezing. `Freezing`: Invalid results are excluded from speed testing.
+  `Unfreezing`: Automatically unfreezes and retests when no results are available.
 - Added `Maximum Resolution` limit `min_resolution`.
 - Support for speed testing and generation of interfaces with `Request Headers`. Requires player support for playback
   and can be controlled via `open_headers`.
@@ -75,8 +171,6 @@
 - Refactored `Speed Test and Sorting` logic to adapt to more types of interfaces (#1009).
 - Provided `Built-in Results` to address the issue of no results during the first run (may be unstable, recommended to
   use updated results).
-- Optimized the use of `Historical Results` by filtering out invalid historical interfaces, which will no longer
-  participate in speed tests.
 - Optimized interface speed testing to default to `Full Interface Speed Test`, resolving inaccuracies in speed tests for
   some interfaces with shared Host results.
 - Adjusted speed test results to sort by `Rate`, with `Resolution` no longer included, resolving the issue of low-rate
