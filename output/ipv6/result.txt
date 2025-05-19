@@ -1,5 +1,5 @@
 🕘️更新时间,#genre#
-2025-05-17 18:18:43,http://php.jdshipin.com/TVOD/iptv.php?id=rthk33
+2025-05-19 18:18:24,http://php.jdshipin.com/TVOD/iptv.php?id=rthk33
 
 📺央视频道,#genre#
 CCTV-1,http://php.jdshipin.com/TVOD/iptv.php?id=rthk33
@@ -544,12 +544,12 @@ CCTV-17,https://www.freetv.top/migu/673168256.m3u8?migutoken=04374bdde2e42237981
 广东体育,http://cdn2.163189.xyz/live/gdty/stream.m3u8
 广东体育,http://php.jdshipin.com/PLTV/iptv.php?id=gdty
 广东体育,http://php.jdshipin.com/TVOD/iptv.php?id=gdty
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-25.ctv
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-3.m3u8
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-30.m3u8
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-33.ctv
 广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-34.ctv
 广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-36.m3u8
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-38.ctv
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-39.ctv
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-7.ctv
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-15.ctv
 广东新闻,https://stream1.freetv.fun/yan-dong-xin-wen-9.ctv
 广东新闻,https://stream1.freetv.fun/yan-dong-xin-wen-27.ctv
 广东新闻,https://stream1.freetv.fun/yan-dong-xin-wen-20.ctv
@@ -611,15 +611,15 @@ CCTV-17,https://www.freetv.top/migu/673168256.m3u8?migutoken=04374bdde2e42237981
 广州影视,https://stream1.freetv.fun/yan-zhou-ying-shi-15.ctv
 广州影视,https://stream1.freetv.fun/yan-zhou-ying-shi-12.ctv
 广州竞赛,http://php.jdshipin.com:8880/gztv.php?id=jingsai#https://tencentplay.gztv.com/live/jingsai.m3u8?txSecret=49c8041461997c7a97dbcc3c7fd11b4f&txTime=18d00acf487
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-18.ctv
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-33.ctv
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-31.ctv
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-3.m3u8
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-4.m3u8
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-12.ctv
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-4.ctv
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-27.ctv
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-37.m3u8
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-26.ctv
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-35.ctv
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-24.ctv
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-15.ctv
 江门综合,https://stream1.freetv.fun/jiang-men-zong-he-8.ctv
 江门综合,https://stream1.freetv.fun/jiang-men-zong-he-6.ctv
 江门综合,https://stream1.freetv.fun/jiang-men-zong-he-12.ctv
@@ -937,6 +937,7 @@ CCTV-17,https://www.freetv.top/migu/673168256.m3u8?migutoken=04374bdde2e42237981
 上虞文化影院,http://l.cztvcloud.com/channels/lantian/SXshangyu2/720p.m3u8
 上虞文化影院,https://stream1.freetv.fun/shang-yu-wen-hua-ying-yuan-2.ctv
 上虞文化影院,https://stream1.freetv.fun/shang-yu-wen-hua-ying-yuan-1.m3u8
+上虞文化影院,http://l.cztvcloud.com/channels/lantian/SXshangyu2/720p.m3u8?zzhed;http://l.cztvcloud.com/channels/lantian/SXshangyu2/720p.m3u8zzhed
 上虞文化影视,http://l.cztvcloud.com/channels/lantian/SXshangyu2/720p.m3u8
 
 ☘️北京频道,#genre#
@@ -1924,11 +1925,11 @@ CCTV-17,https://www.freetv.top/migu/673168256.m3u8?migutoken=04374bdde2e42237981
 凤凰中文,http://cdn.163.dedyn.io/live/fhzw/stream.m3u8
 凤凰中文,http://php.jdshipin.com/TVOD/iptv.php
 凤凰中文,http://cdn.163189.xyz/live/fhzw/stream.m3u8
-凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-6.m3u8
-凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-10.m3u8
-凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-11.m3u8
-凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-16.m3u8
 凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-5.ctv
+凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-4.m3u8
+凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-15.m3u8
+凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-8.m3u8
+凤凰中文,https://stream1.freetv.fun/feng-huang-zhong-wen-18.ctv
 凤凰资讯,https://cdn6.163189.xyz/live/fhzx/stream.m3u8
 凤凰资讯,http://php.jdshipin.com/TVOD/iptv.php?id=fhzx2
 凤凰资讯,https://smart.pendy.dpdns.org/Smart.php?id=phoenixinfo_hd
@@ -2148,12 +2149,12 @@ CCTV-5+,http://[2409:8087:1a01:df::4077]/ottrrs.hl.chinamobile.com/yinhe/8888888
 广东体育,http://cdn2.163189.xyz/live/gdty/stream.m3u8
 广东体育,http://php.jdshipin.com/PLTV/iptv.php?id=gdty
 广东体育,http://php.jdshipin.com/TVOD/iptv.php?id=gdty
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-25.ctv
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-3.m3u8
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-30.m3u8
-广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-33.ctv
 广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-34.ctv
 广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-36.m3u8
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-38.ctv
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-39.ctv
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-7.ctv
+广东体育,https://stream1.freetv.fun/yan-dong-ti-yu-15.ctv
 纬来体育,https://stream1.freetv.fun/wei-lai-ti-yu-9.ctv
 纬来体育,https://smart.pendy.dpdns.org/Smart.php?id=videolandsport
 纬来体育,https://epg.pw/stream/8855a9936e37e608a0ec8a014cce1673dee9c5d68d560da376cc92e5edef2b25.m3u8
@@ -2195,15 +2196,15 @@ CCTV-5+,http://[2409:8087:1a01:df::4077]/ottrrs.hl.chinamobile.com/yinhe/8888888
 精品体育,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226328/1.m3u8
 精品体育,http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888888/224/3221225709/2/index.m3u8
 广州竞赛,http://php.jdshipin.com:8880/gztv.php?id=jingsai#https://tencentplay.gztv.com/live/jingsai.m3u8?txSecret=49c8041461997c7a97dbcc3c7fd11b4f&txTime=18d00acf487
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-18.ctv
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-33.ctv
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-31.ctv
-广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-3.m3u8
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-4.m3u8
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-12.ctv
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-4.ctv
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-27.ctv
 广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-37.m3u8
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-26.ctv
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-35.ctv
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-24.ctv
+广州竞赛,https://stream1.freetv.fun/yan-zhou-jing-sai-15.ctv
 辽宁体育,https://stream1.freetv.fun/liao-zhu-ti-yu-5.m3u8
 辽宁体育,https://stream1.freetv.fun/liao-zhu-ti-yu-3.m3u8
 山东体育,https://stream1.freetv.fun/shan-dong-ti-yu-8.m3u8
@@ -2274,14 +2275,14 @@ CN卡通,https://stream1.freetv.fun/cnqia-tong-2.m3u8
 优漫卡通,https://stream1.freetv.fun/4073fb5ec1ec48f010e1db882aeb63ddc7104c56c5c729c4d08e932d585591a8.m3u8
 金鹰卡通,http://[2409:8087:1a01:df::7005]/ottrrs.hl.chinamobile.com/PLTV/2/224/3221225653/2.m3u8
 金鹰卡通,http://nas.suntao.online:35455/bptv/10000100000000050000000004796942.m3u8
-金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-13.m3u8
-金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-44.m3u8
 金鹰卡通,http://dsj.motem.top:8880/bptv/10000100000000050000000004796942.m3u8
-金鹰卡通,https://stream1.freetv.fun/ipv6-jin-ying-qia-tong-7.m3u8
 金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-9.ctv
 金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-39.m3u8
 金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-10.m3u8
 金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-41.ctv
+金鹰卡通,https://stream1.freetv.fun/jin-ying-qia-tong-21.m3u8
+金鹰卡通,https://stream1.freetv.fun/ipv6-jin-ying-qia-tong-13.m3u8
+金鹰卡通,https://stream1.freetv.fun/f563b977599985b4eecdad9c802930fc79a2adbd22b40712ec657cba6adc5fcf.m3u8
 黑莓动画,http://php.jdshipin.com/TVOD/hnyd.php?id=200000001898/460000089800010002
 黑莓动画,http://otttv.bj.chinamobile.com/PLTV/88888888/224/3221226935/1.m3u8?GuardEncType=2&accountinfo=%7E%7EV2.0%7EUc618y1E09GbQwwuOzEKaQ%7EtP4-l0lmSfjwLWEfK_el1vH_mv-s1zo4AQJwdedaVwG9xkuFTDg8J26cwOrNJzn20BErrHdLhuZ9EzLUCD3PMW-OMx4MGteHV2vLeW6BqoY%2CEND
 黑莓动画,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226935/1.m3u8
