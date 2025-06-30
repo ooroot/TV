@@ -1,58 +1,40 @@
-name: 'Upstream Sync'
+name: Sync Upstream
 
-on:
+permissions: write-all              # grant write permission
+
+on: 
   schedule:
-    - cron:  '0 7 * * 1,4'
-    # scheduled at 07:00 every Monday and Thursday
-
-  workflow_dispatch:  # click the button on Github repo!
-    inputs:
-      sync_test_mode: # Adds a boolean option that appears during manual workflow run for easy test mode config
-        description: 'Fork Sync Test Mode'
-        type: boolean
-        default: false
+    - cron: '0 0 * * 1'             # scheduled for 00:00 every Monday
+  workflow_dispatch:                # trigger manually
 
 jobs:
-  sync_latest_from_upstream:
+  sync-upstream:
     runs-on: ubuntu-latest
-    name: Sync latest commits from upstream repo
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: upstream             # set the branch to merge to
+          fetch-depth: 0 
+      - name: Sync Upstream
+        uses: Guovin/iptv-api@v1
+        with:
+          upstream: Guovin/iptv-api    # set the upstream repo
+          upstream-branch: gd   # set the upstream branch to merge from
+          branch: upstream          # set the branch to merge to
 
-    steps:
-    # REQUIRED step
-    # Step 1: run a standard checkout action, provided by github
-    - name: Checkout target repo
-      uses: actions/checkout@v3
-      with:
-        # optional: set the branch to checkout,
-        # sync action checks out your 'target_sync_branch' anyway
-        ref:  my-branch
-        # REQUIRED if your upstream repo is private (see wiki)
-        persist-credentials: false
-
-    # REQUIRED step
-    # Step 2: run the sync action
-    - name: Sync upstream changes
-      id: sync
-      uses: Guovin/iptv-api
-      with:
-        target_sync_branch: my-branch
-        # REQUIRED 'target_repo_token' exactly like this!
-        target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-        upstream_sync_branch: main
-        upstream_sync_repo: Guovin/iptv-api
-        upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
-
-        # Set test_mode true during manual dispatch to run tests instead of the true action!!
-        test_mode: ${{ inputs.sync_test_mode }}
-      
-    # Step 3: Display a sample message based on the sync output var 'has_new_commits'
-    - name: New commits found
-      if: steps.sync.outputs.has_new_commits == 'true'
-      run: echo "New commits were found to sync."
-    
-    - name: No new commits
-      if: steps.sync.outputs.has_new_commits == 'false'
-      run: echo "There were no new commits."
-      
-    - name: Show value of 'has_new_commits'
-      run: echo ${{ steps.sync.outputs.has_new_commits }}
+  # set up another job to merge another branch
+  sync-upstream-another-branch:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: another-branch       # set the branch to merge to
+          fetch-depth: 0 
+      - name: Sync Upstream
+        uses: ooroot/TV@v1
+        with:
+          upstream: ooroot/TV              # set the upstream repo
+          upstream-branch: another-branch   # set the upstream branch to merge from
+          branch: another-branch            # set the branch to merge to
