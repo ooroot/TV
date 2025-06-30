@@ -33,7 +33,7 @@ jobs:
     # Step 2: run the sync action
     - name: Sync upstream changes
       id: sync
-      uses: Guovin/iptv-api@v3.4.1
+      uses: Guovin/iptv-api
       with:
         target_sync_branch: my-branch
         # REQUIRED 'target_repo_token' exactly like this!
