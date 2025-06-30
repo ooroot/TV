@@ -33,13 +33,13 @@ jobs:
     # Step 2: run the sync action
     - name: Sync upstream changes
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+      uses: Guovin/iptv-api@v3.4.1
       with:
         target_sync_branch: my-branch
         # REQUIRED 'target_repo_token' exactly like this!
         target_repo_token: ${{ secrets.GITHUB_TOKEN }}
         upstream_sync_branch: main
-        upstream_sync_repo: aormsby/Fork-Sync-With-Upstream-action
+        upstream_sync_repo: Guovin/iptv-api
         upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
 
         # Set test_mode true during manual dispatch to run tests instead of the true action!!
